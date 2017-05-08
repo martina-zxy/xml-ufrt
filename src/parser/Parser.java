@@ -1,8 +1,8 @@
 package parser;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,6 +25,78 @@ public class Parser {
 		return action;
 	}
 	
+	public void printToFile() {
+		try{
+		    PrintWriter writer = new PrintWriter(action.name + "_Action.pddl", "UTF-8");
+		    writer.println("(:action " + action.name);
+	        
+		    writer.print("\t:parameters ");
+	        for(int i = 0; i < action.paramList.size(); i++) {
+	        	Param r = (Param)action.paramList.get(i);
+	        	writer.print("?" + r.parameter + " ");
+	        }
+	        writer.println(")");
+	        
+	        writer.println("\t:precondition ");
+	        int precondSize = action.preconditionList.size();
+	        if (precondSize > 1) {
+	        	writer.print("\t\t(and ");
+	        } 
+	        for(int i = 0; i < precondSize ; i++) {
+	        	String print = "";
+	        	if (action.preconditionList.get(i) instanceof Param) {
+	        		Param r = (Param)action.preconditionList.get(i);
+	            	print = "(" + r.type + " ?" + r.parameter + ")";
+	        	} else if (action.preconditionList.get(i) instanceof Predicate) {
+	        		Predicate r = (Predicate)action.preconditionList.get(i);
+	        		print = "(" + r.name;
+	        		for (Param par : r.params) {
+	        			print += " " + par.type + " ?" + par.parameter;	
+	        		}
+	        		print += ")";
+	        	}
+	        	if (i > 0) print = "\t\t" + print;
+	        	writer.println(print);
+	        	
+	        }
+	        if (precondSize > 1) {
+	        	writer.println("\t\t)");
+	        } 
+	        
+	        writer.println("\t:effect ");
+	        int effectSize = action.effectsList.size();
+	        if (effectSize > 1) {
+	        	writer.print("\t\t(and ");
+	        } 
+	        for(int i = 0; i < effectSize ; i++) {
+	        	String print = "";
+	        	if (action.effectsList.get(i) instanceof Param) {
+	        		Param r = (Param)action.effectsList.get(i);
+	            	print = "(" + r.type + " ?" + r.parameter + ")";
+	        	} else if (action.effectsList.get(i) instanceof Predicate) {
+	        		Predicate r = (Predicate)action.effectsList.get(i);
+	        		print = "(" + r.name + " ";
+	        		
+	        		for (Param par : r.params) {
+	        			print += par.type + " ?" + par.parameter + " ";	
+	        		}
+	        		print += ")";
+	        	}
+	        	if (i > 0) print = "\t\t" + print;
+	        	writer.println(print);
+	        }
+	        if (effectSize > 1) {
+	        	writer.println("\t\t)");
+	        } 
+	        writer.println(")");
+		    writer.close();
+		} catch (IOException e) {
+		   // do something
+		}
+	}
+	
+	
+	
 	public void parse(File file){
 	    ArrayList input = new ArrayList();
 	    ArrayList output = new ArrayList();
@@ -41,19 +113,7 @@ public class Parser {
 			this.action = new Action();
 			action.name = actionNode.getAttribute("rdf:ID");
             
-            // parse input 
-//            NodeList hasInputList = doc.getElementsByTagName("profile:hasInput");
-//            for (int idx = 0; idx < hasInputList.getLength(); idx++) {
-//            	Element el = (Element) hasInputList.item(idx);
-//            	String inputPar = el.getAttribute("rdf:resource").replace("#_", "");
-//            	
-//            	System.out.println("input :"+ inputPar);
-//            	
-//            	Param par = new Param();
-//            	par.parameter = inputPar;
-//            	input.add(par);
-//            }
-            
+			// parse input
             NodeList inputList = doc.getElementsByTagName("process:Input");
             for (int idx = 0; idx < inputList.getLength(); idx++) {
             	Element el = (Element) inputList.item(idx);
@@ -63,8 +123,6 @@ public class Parser {
             	String inputType = this.cleanType(inputTypeNode.item(0).getTextContent());
             	
             	inputPar = inputPar.replace("_", "");
-//            	System.out.println("input :"+ inputPar);
-//            	System.out.println("type :" + inputType);
             	
             	Param par = new Param();
             	par.parameter = inputPar;
@@ -81,7 +139,6 @@ public class Parser {
             	String precondName = el.getAttribute("rdf:ID").replace("_", "");
             	
             	pred.name = precondName;
-//            	System.out.println("percondName :"+ precondName);
             	
             	int argIdx = 1;
             	NodeList args = el.getElementsByTagName("swrl:argument" + argIdx);
@@ -94,27 +151,12 @@ public class Parser {
                 	par.type = type;
                 	pred.params.add(par);
                 	
-//            		System.out.println(par.parameter);
-//            		System.out.println(par.type);
             		argIdx ++ ;
             		args = el.getElementsByTagName("swrl:argument" + argIdx);
             	}
             	input.add(pred);
             }
-            
-            // parse output 
-//            NodeList hasOutputList = doc.getElementsByTagName("profile:hasOutput");
-//            for (int idx = 0; idx < hasOutputList.getLength(); idx++) {
-//            	Element el = (Element) hasOutputList.item(idx);
-//            	String outputPar = el.getAttribute("rdf:resource");
-//            	outputPar = outputPar.replace("#_", "");
-//            	System.out.println("output :"+ outputPar);
-//            	
-//            	Param par = new Param();
-//            	par.parameter = outputPar;
-//            	output.add(par);
-//            }
-//            
+ 
             NodeList outputList = doc.getElementsByTagName("process:Output");
             for (int idx = 0; idx < outputList.getLength(); idx++) {
             	Element el = (Element) outputList.item(idx);
@@ -123,9 +165,6 @@ public class Parser {
             	
             	NodeList outputTypeNode = el.getElementsByTagName("process:parameterType");
             	String outputType = this.cleanType(outputTypeNode.item(0).getTextContent());
-            	
-//            	System.out.println("output :"+ outputPar);
-//            	System.out.println("type :" + outputType);
             	
             	Param par = new Param();
             	par.parameter = outputPar;
@@ -155,8 +194,6 @@ public class Parser {
                 	par.type = type;
                 	pred.params.add(par);
                 	
-//            		System.out.println(par.parameter);
-//            		System.out.println(par.type);
             		argIdx ++ ;
             		args = el.getElementsByTagName("swrl:argument" + argIdx);
             	}
@@ -164,27 +201,61 @@ public class Parser {
             }
             // end parse result
             
+            // parse input 
+//          NodeList hasInputList = doc.getElementsByTagName("profile:hasInput");
+//          for (int idx = 0; idx < hasInputList.getLength(); idx++) {
+//          	Element el = (Element) hasInputList.item(idx);
+//          	String inputPar = el.getAttribute("rdf:resource").replace("#_", "");
+//          	
+//          	System.out.println("input :"+ inputPar);
+//          	
+//          	Param par = new Param();
+//          	par.parameter = inputPar;
+//          	input.add(par);
+//          }
+            
+            // parse output 
+//            NodeList hasOutputList = doc.getElementsByTagName("profile:hasOutput");
+//            for (int idx = 0; idx < hasOutputList.getLength(); idx++) {
+//            	Element el = (Element) hasOutputList.item(idx);
+//            	String outputPar = el.getAttribute("rdf:resource");
+//            	outputPar = outputPar.replace("#_", "");
+//            	System.out.println("output :"+ outputPar);
+//            	
+//            	Param par = new Param();
+//            	par.parameter = outputPar;
+//            	output.add(par);
+//            }
+//            
+            
+            
             action.preconditionList.addAll(input);
             action.effectsList.addAll(output);
             
             for(int i = 0; i < input.size(); i++) {
+            	action.paramPredicateList.add(input.get(i));
             	if (input.get(i) instanceof Param) {
-            		action.inputParamList.add(input.get(i));
+            		action.paramList.add(input.get(i));
             	} else if (input.get(i) instanceof Predicate) {
             		Predicate pre = (Predicate)input.get(i);
-            		action.inputParamList.addAll(pre.params);
+            		action.paramList.addAll(pre.params);
+            		action.paramPredicateList.addAll(pre.params);
             	}
             }
 
             for(int i = 0; i < output.size(); i++) {
+            	action.paramPredicateList.add(output.get(i));
             	if (output.get(i) instanceof Param) {
-            		action.inputParamList.add(output.get(i));
+            		action.paramList.add(output.get(i));
             	} else if (output.get(i) instanceof Predicate) {
             		Predicate pre = (Predicate)output.get(i);
-            		action.inputParamList.addAll(pre.params);
+            		action.paramList.addAll(pre.params);
+            		action.paramPredicateList.addAll(pre.params);
             	}
             }
+            
             action.removeDoubleInputParameter();
+            action.removeDoubleParamPredicate();
 //            System.out.println("============");
             
 //            for (int i = 0; i < action.inputParamList.size(); i++) {
@@ -247,7 +318,7 @@ public class Parser {
 		return type.split("http://127.0.0.1/")[1];
 	}
 	
-	public String getParam(String type) {
+	public String getParam(String type) {		
 		return type.split("#")[1];
 	}
 }
