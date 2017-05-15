@@ -7,8 +7,10 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.DefaultListCellRenderer;
@@ -34,7 +36,7 @@ import pddl_datatype.Problem;
 
 public class MainFrame {
 
-	private JFrame frame;
+	private JFrame frmOwlsTranslator;
 	private JTextField txtSelectFile;
 	final JFileChooser fc = new JFileChooser();	
 	private JTabbedPane tabbedPane;
@@ -43,7 +45,7 @@ public class MainFrame {
 	private JTextArea log;
 	private JButton btnContinue;
 	private JButton btnAddAction;
-	private Domain dom = new Domain();
+	private Domain domain = new Domain();
 	private Action currAction;
 	private JLabel lblActionCounter;
 	private JScrollPane scrollPane_1;
@@ -76,6 +78,11 @@ public class MainFrame {
 	private JTextArea txtProblem;
 	private JButton btnReset;
 	private JButton btnStrips;
+	private JPanel pnlStrips;
+	private JScrollPane scrollPane_3;
+	private JTextArea txtStrips;
+	private JLabel lblNewLabel;
+	private List<Action> listAction = new ArrayList<Action>();
 	
 	/**
 	 * Launch the application.
@@ -85,7 +92,7 @@ public class MainFrame {
 			public void run() {
 				try {
 					MainFrame window = new MainFrame();
-					window.frame.setVisible(true);
+					window.frmOwlsTranslator.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -106,15 +113,38 @@ public class MainFrame {
 	@SuppressWarnings({ "serial", "unchecked" })
 	private void initialize() {
 		
-		frame = new JFrame();
-		frame.setBounds(100, 100, 769, 574);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		frmOwlsTranslator = new JFrame();
+		frmOwlsTranslator.setTitle("OWLS Translator");
+		frmOwlsTranslator.setBounds(100, 100, 769, 574);
+		frmOwlsTranslator.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmOwlsTranslator.getContentPane().setLayout(null);
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(10, 9, 733, 514);
-		frame.getContentPane().add(tabbedPane);
+		frmOwlsTranslator.getContentPane().add(tabbedPane);
 		
+		// 1. OWLS2Action Tab
+		createOWLS2ActionPanel();
+		
+		// 2. Domain File Tab
+		createDomainFilePanel();
+		
+		// 3. Select Input & Output Tab
+		createSelectIOPanel();
+		
+		// 4. Problem File Tab
+		createProblemFileTab();
+		
+		// 5. Strips Planning Tab
+		createStripsPlanningTab();
+		
+	}
+	
+	/**
+	 * 1. OWLS2Action Tab
+	 */
+	
+	public void createOWLS2ActionPanel() {
 		// 1. OWLS2Action
 		pnlConvertOwls = new JPanel();
 		tabbedPane.addTab("1. OWLS2Action", null, pnlConvertOwls, null);
@@ -132,24 +162,42 @@ public class MainFrame {
 		gbc_btnNewButton.gridx = 0;
 		gbc_btnNewButton.gridy = 0;
 		pnlConvertOwls.add(btnNewButton, gbc_btnNewButton);
+		
+		fc.setMultiSelectionEnabled(true);
+		
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int returnval = fc.showOpenDialog(frame);
-				
+				int returnval = fc.showOpenDialog(frmOwlsTranslator);
 				
 				if (returnval == JFileChooser.APPROVE_OPTION) {
 					log.setText(null);
-		            File file = fc.getSelectedFile();
-		            txtSelectFile.setText(fc.getSelectedFile().toString());
+					
+		            File[] files = fc.getSelectedFiles();
 		            
-		            // Parse
-		            Parser parser = new Parser();
-		            parser.parse(file);		            
-		            currAction = parser.getAction();
-		            log.append(currAction.getPddl());
-		        } else {
-		        	System.out.println("Open command cancelled by user.\n");
-		        }
+		            StringBuilder sb = new StringBuilder();
+		            for (File file : files) {
+		            	
+		            	// Check extension - skip non owls
+		            	String extension = "";
+		            	int i = file.toString().lastIndexOf('.');
+		            	if (i > 0) {
+		            	    extension = file.toString().substring(i+1);
+		            	}
+		            	if (!extension.equals("owls")) continue;
+		            	
+						sb.append(file.toString());
+					
+						// Parse action
+						Parser parser = new Parser();
+			            parser.parse(file);		            
+			            currAction = parser.getAction();
+			            listAction.add(parser.getAction());
+			            log.append("\n");
+			            log.append(currAction.getPddl());
+					}
+		            
+		            txtSelectFile.setText(sb.toString());
+				}
 			}
 		});
 		btnNewButton.setVerticalAlignment(SwingConstants.BOTTOM);
@@ -184,15 +232,16 @@ public class MainFrame {
 		btnAddAction = new JButton("Add to Domain File");
 		btnAddAction.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				if (domain == null) domain = new Domain();
 				addActionToDomain();
 			}
 		});
 		
-		
+		// Reset variables
 		btnReset = new JButton("Reset!");
 		btnReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dom = new Domain();
+				domain = new Domain();
 				updateLabelCounter();
 				log.setText("");
 				txtDomain.setText("");
@@ -231,19 +280,23 @@ public class MainFrame {
 		btnContinue = new JButton("Continue");
 		btnContinue.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (dom.listAction.size() > 0) {
+				if (domain.listAction.size() > 0) {
 					tabbedPane.setSelectedIndex(1);
 				}
 
-//				inputOptions.addElement(new Param("param" , "type"));
 			}
 		});
 		GridBagConstraints gbc_btnContinue = new GridBagConstraints();
 		gbc_btnContinue.gridx = 10;
 		gbc_btnContinue.gridy = 2;
 		pnlConvertOwls.add(btnContinue, gbc_btnContinue);
-		
-		// 2. View Domain File
+	}
+	
+	/**
+	 * 2. Domain File Tab
+	 */
+	private void createDomainFilePanel() {
+
 		JPanel pnlViewDomain = new JPanel();
 		tabbedPane.addTab("2. Domain File", null, pnlViewDomain, null);
 
@@ -281,7 +334,12 @@ public class MainFrame {
 		gbc_btnCreateProblemFile.gridy = 1;
 		pnlViewDomain.add(btnGenProblem, gbc_btnCreateProblemFile);
 		
-		// 3. Select Input & Output
+	}
+
+	/**
+	 * 3. Select IO Tab
+	 */
+	private void createSelectIOPanel() {
 		pnlSelectIO = new JPanel();
 		tabbedPane.addTab("3. Select Input & Output", null, pnlSelectIO, null);
 		GridBagLayout gbl_pnlSelectIO = new GridBagLayout();
@@ -312,6 +370,7 @@ public class MainFrame {
                 return renderer;
             }
         });
+		
 		inputSelectedScrollPane = new JScrollPane(listInputSelected);
 		GridBagConstraints gbc_inputSelectedScrollPane = new GridBagConstraints();
 		gbc_inputSelectedScrollPane.gridheight = 4;
@@ -323,6 +382,7 @@ public class MainFrame {
 		
 		inputSelectedScrollPane.setViewportView(listInputSelected);
 		
+		// Button choose input
 		btnInputInsert = new JButton(">");
 		btnInputInsert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -350,6 +410,7 @@ public class MainFrame {
 				}
 			}
 		});
+		
 		GridBagConstraints gbc_btnInputRemove = new GridBagConstraints();
 		gbc_btnInputRemove.insets = new Insets(0, 0, 5, 5);
 		gbc_btnInputRemove.gridx = 1;
@@ -435,6 +496,7 @@ public class MainFrame {
 		
 		outputSelectedScrollPane.setViewportView(listOutputSelected);
 		
+		// Button choose output
 		btnOutputInsert = new JButton(">");
 		btnOutputInsert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -485,13 +547,19 @@ public class MainFrame {
 				
 			}
 		});
+		
 		btnCreateProblemFile.setHorizontalAlignment(SwingConstants.RIGHT);
 		GridBagConstraints gbc_btnGenerateProblemFile = new GridBagConstraints();
 		gbc_btnGenerateProblemFile.anchor = GridBagConstraints.EAST;
 		gbc_btnGenerateProblemFile.gridx = 2;
 		gbc_btnGenerateProblemFile.gridy = 10;
 		pnlSelectIO.add(btnCreateProblemFile, gbc_btnGenerateProblemFile);
-		
+	}
+	
+	/**
+	 * 4. Problem File Tab
+	 */
+	private void createProblemFileTab() {
 		pnlViewProblem = new JPanel();
 		tabbedPane.addTab("4. Problem File", null, pnlViewProblem, null);
 		GridBagLayout gbl_pnlViewProblem = new GridBagLayout();
@@ -516,72 +584,134 @@ public class MainFrame {
 		btnStrips = new JButton("Solve!");
 		btnStrips.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				if (domain != null && problem != null) {
+					
+					StripsPlanner planner = new StripsPlanner(domain, problem);
+					planner.plan();
+
+					txtStrips.setText(planner.getPlanStr());
+					tabbedPane.setSelectedIndex(4);
+				}
 			}
 		});
+		
 		GridBagConstraints gbc_btnStrips = new GridBagConstraints();
 		gbc_btnStrips.anchor = GridBagConstraints.EAST;
 		gbc_btnStrips.gridx = 0;
 		gbc_btnStrips.gridy = 1;
 		pnlViewProblem.add(btnStrips, gbc_btnStrips);
-		
 	}
 	
+	/**
+	 * 5. Planning Tab
+	 */
+	private void createStripsPlanningTab() {
+		pnlStrips = new JPanel();
+		tabbedPane.addTab("5. Planning", null, pnlStrips, null);
+		GridBagLayout gbl_pnlStrips = new GridBagLayout();
+		gbl_pnlStrips.columnWidths = new int[]{0, 0};
+		gbl_pnlStrips.rowHeights = new int[]{0, 0, 0};
+		gbl_pnlStrips.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_pnlStrips.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
+		pnlStrips.setLayout(gbl_pnlStrips);
+		
+		lblNewLabel = new JLabel("=====PLAN=====");
+		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 0);
+		gbc_lblNewLabel.gridx = 0;
+		gbc_lblNewLabel.gridy = 0;
+		pnlStrips.add(lblNewLabel, gbc_lblNewLabel);
+		
+		scrollPane_3 = new JScrollPane();
+		GridBagConstraints gbc_scrollPane_3 = new GridBagConstraints();
+		gbc_scrollPane_3.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane_3.gridx = 0;
+		gbc_scrollPane_3.gridy = 1;
+		pnlStrips.add(scrollPane_3, gbc_scrollPane_3);
+		
+		txtStrips = new JTextArea();
+		txtStrips.setEditable(false);
+		txtStrips.setTabSize(2);
+		scrollPane_3.setViewportView(txtStrips);
+	}
+
+	/**
+	 * Reset the view
+	 */
 	public void reset() {
 		log.setText("");
 		txtSelectFile.setText("Select an OWL-S file");
 	}
 	
+	/**
+	 * Update the action counter label
+	 */
 	public void updateLabelCounter() {
-		lblActionCounter.setText("Number of Action : " + dom.listAction.size());
+		lblActionCounter.setText("Number of Action : " + domain.listAction.size());
 	}
 	
+	/**
+	 * Add all inserted action (in the panel) to the domain file
+	 */
 	public void addActionToDomain() {
-		if (currAction != null) {
-			for (Action act : dom.listAction) {
-				System.out.println(act.name);
-				if (currAction.name.equals(act.name)) {
-					JOptionPane.showMessageDialog(frame, "Action:" + currAction.name + " has been added before", "Info", JOptionPane.INFORMATION_MESSAGE);
-					reset();
-					return;	
-				}
-			}
-			dom.addAction(currAction);
-			
-			// View action and reset view
-			txtDomain.setText(dom.getPddl());
-			updateLabelCounter();
-			JOptionPane.showMessageDialog(frame, "Action:" + currAction.name + " is successfully added", "Success", JOptionPane.INFORMATION_MESSAGE);
-			reset();
-			
-			// Add paramSet
-			System.out.println(currAction.paramPredicateList.size());
-			for (int i = 0; i < currAction.paramPredicateList.size(); i++) {
-				Object p = currAction.paramPredicateList.get(i);
+
+		if (listAction.size() > 0) {
+			for (Action currAction : listAction) {
 				
-				if(!paramSet.contains(p)) {
-					if (p instanceof Param) {
-//						System.out.println(paramSet.contains((Param)p));
-						paramSet.add((Param)p);
-						inputOptions.addElement((Param)p);
-						outputOptions.addElement((Param)p);
-					} else if (p instanceof Predicate) {
-//						System.out.println(paramSet.contains((Predicate)p));
-						paramSet.add((Predicate)p);
-						inputOptions.addElement((Predicate)p);
-						outputOptions.addElement((Predicate)p);
+				// Check if action exists
+				boolean isActionExist = false;
+				for (Action act : domain.listAction) {
+					
+					if (currAction.name.equals(act.name)) {
+						JOptionPane.showMessageDialog(frmOwlsTranslator, "Duplicate Action:" + currAction.name, "Info", JOptionPane.INFORMATION_MESSAGE);
+						isActionExist = true;
+						break;
+	
 					}
 				}
+				// End check if action exists
+				
+				if (isActionExist) continue;
+				domain.addAction(currAction);
+				
+				// View action and reset view
+				txtDomain.setText(domain.getPddl());
+				updateLabelCounter();
+				
+				// Add paramSet
+				for (int i = 0; i < currAction.paramPredicateList.size(); i++) {
+					Object p = currAction.paramPredicateList.get(i);
+					
+					if(!paramSet.contains(p)) {
+						if (p instanceof Param) {
 
+							paramSet.add((Param)p);
+							inputOptions.addElement((Param)p);
+							outputOptions.addElement((Param)p);
+						} else if (p instanceof Predicate) {
+
+							paramSet.add((Predicate)p);
+							inputOptions.addElement((Predicate)p);
+							outputOptions.addElement((Predicate)p);
+						}
+					}
+	
+				}
+			}
+			String show = String.valueOf(listAction.size());
+			if (listAction.size() > 1) {
+				show += " actions have been successfully added";
+			}
+			else {
+				show += " action has been successfully added";
 			}
 			
-			currAction = null;
+			JOptionPane.showMessageDialog(frmOwlsTranslator, show, "Success", JOptionPane.INFORMATION_MESSAGE);
+			reset();
+			listAction.clear();
+
 		} else {
-			 JOptionPane.showMessageDialog(frame, "Load an OWL-S file", "Error", JOptionPane.ERROR_MESSAGE);
+			 JOptionPane.showMessageDialog(frmOwlsTranslator, "Load an OWL-S file", "Error", JOptionPane.ERROR_MESSAGE);
 		}
-	}
-	
-	public void OwlsToActionPanel() {
-		
 	}
 }

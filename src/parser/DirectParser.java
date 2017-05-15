@@ -16,12 +16,9 @@ public class DirectParser {
         parser.parse(file);
         System.out.println(parser.getAction().getPddl());
         
-        
-        
         Set set = new HashSet();
         Action result = parser.getAction();
         for (int i = 0; i < result.paramPredicateList.size(); i++) {
-//			Param par = (Param)result.paramPredicateList.get(i);
 			
 			set.add(result.paramPredicateList.get(i));
 		}
@@ -37,15 +34,6 @@ public class DirectParser {
         for (Object obj : set) {
         	System.out.println(obj.toString());
         }
-        
-//        for (Param par : result.inputParamList){
-//        	
-//        }
-//        result.inputParamList;
-        
-//        parser.printToFile();
-        
-        //This is where a real application would open the file.
         
 	}
 

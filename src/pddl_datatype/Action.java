@@ -9,10 +9,10 @@ public class Action {
 	public ArrayList preconditionList = new ArrayList();
 	public ArrayList effectsList = new ArrayList();
 	public ArrayList paramPredicateList = new ArrayList();
-	public String pddl;
+	public String pddl; // PDDL format representation
 	
 	public void removeDoubleInputParameter() {
-	    // removables contains the list of double entires, that have to removed in the second step
+	    // removables contains the list of double entries, that have to be removed later
 	    ArrayList removables = new ArrayList();
 	    for (int i = 0; i<this.paramList.size(); i++) {
 	        Param te = (Param)this.paramList.get(i);
@@ -21,7 +21,6 @@ public class Action {
 		        if (te.parameter.equals(ite.parameter))
 		            removables.add(ite);
 		    }
-		
 	    }
 	    
 	    // remove
@@ -32,7 +31,7 @@ public class Action {
 	}
 	
 	public void removeDoubleParamPredicate() {
-	    // removables contains the list of double entires, that have to removed in the second step
+		// removables contains the list of double entries, that have to be removed later
 	    ArrayList removables = new ArrayList();
 	    for (int i = 0; i<this.paramPredicateList.size(); i++) {
 	    	if (this.paramPredicateList.get(i) instanceof Param) {
@@ -135,69 +134,17 @@ public class Action {
 		return pddl.toString();
 	}
 	
-//	public void print(){
-//		Action result = this;
-//        System.out.println("(:action " + result.name);
-//        
-//        System.out.print("\t:parameters ");
-//        for(int i = 0; i < result.inputParamList.size(); i++) {
-//        	if (i == 0)System.out.print("(");
-//        	Param r = (Param)result.inputParamList.get(i);
-//        	System.out.print("?" + r.parameter + " ");
-//        }
-//        System.out.println(")");
-//        
-//        System.out.println("\t:precondition ");
-//        int precondSize = result.preconditionList.size();
-//        if (precondSize > 1) {
-//        	System.out.print("\t\t(and ");
-//        } 
-//        for(int i = 0; i < precondSize ; i++) {
-//        	String print = "";
-//        	if (result.preconditionList.get(i) instanceof Param) {
-//        		Param r = (Param)result.preconditionList.get(i);
-//            	print = "(" + r.type + " ?" + r.parameter + ")";
-//        	} else if (result.preconditionList.get(i) instanceof Predicate) {
-//        		Predicate r = (Predicate)result.preconditionList.get(i);
-//        		print = "(" + r.name;
-//        		for (Param par : r.params) {
-//        			print += " " + par.type + " ?" + par.parameter;	
-//        		}
-//        		print += ")";
-//        	}
-//        	if (i > 0) print = "\t\t" + print;
-//        	System.out.println(print);
-//        	
-//        }
-//        if (precondSize > 1) {
-//        	System.out.println("\t\t)");
-//        } 
-//        
-//        System.out.println("\t:effect ");
-//        int effectSize = result.effectsList.size();
-//        if (effectSize > 1) {
-//        	System.out.print("\t\t(and ");
-//        } 
-//        for(int i = 0; i < effectSize ; i++) {
-//        	String print = "";
-//        	if (result.effectsList.get(i) instanceof Param) {
-//        		Param r = (Param)result.effectsList.get(i);
-//            	print = "(" + r.type + " ?" + r.parameter + ")";
-//        	} else if (result.effectsList.get(i) instanceof Predicate) {
-//        		Predicate r = (Predicate)result.effectsList.get(i);
-//        		print = "(" + r.name + " ";
-//        		
-//        		for (Param par : r.params) {
-//        			print += par.type + " ?" + par.parameter + " ";	
-//        		}
-//        		print += ")";
-//        	}
-//        	if (i > 0) print = "\t\t" + print;
-//        	System.out.println(print);
-//        }
-//        if (effectSize > 1) {
-//        	System.out.println("\t\t)");
-//        } 
-//        System.out.println(")");
-//	}
+	public String getHeader() {
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(name + " ");
+		for (Object object : paramList) {
+			Param par = (Param) object;
+			sb.append(par.parameter + " ");
+		}
+		
+		return sb.toString();
+		
+	}
+
 }

@@ -199,36 +199,7 @@ public class Parser {
             	}
             	output.add(pred);
             }
-            // end parse result
-            
-            // parse input 
-//          NodeList hasInputList = doc.getElementsByTagName("profile:hasInput");
-//          for (int idx = 0; idx < hasInputList.getLength(); idx++) {
-//          	Element el = (Element) hasInputList.item(idx);
-//          	String inputPar = el.getAttribute("rdf:resource").replace("#_", "");
-//          	
-//          	System.out.println("input :"+ inputPar);
-//          	
-//          	Param par = new Param();
-//          	par.parameter = inputPar;
-//          	input.add(par);
-//          }
-            
-            // parse output 
-//            NodeList hasOutputList = doc.getElementsByTagName("profile:hasOutput");
-//            for (int idx = 0; idx < hasOutputList.getLength(); idx++) {
-//            	Element el = (Element) hasOutputList.item(idx);
-//            	String outputPar = el.getAttribute("rdf:resource");
-//            	outputPar = outputPar.replace("#_", "");
-//            	System.out.println("output :"+ outputPar);
-//            	
-//            	Param par = new Param();
-//            	par.parameter = outputPar;
-//            	output.add(par);
-//            }
-//            
-            
-            
+
             action.preconditionList.addAll(input);
             action.effectsList.addAll(output);
             
@@ -256,60 +227,14 @@ public class Parser {
             
             action.removeDoubleInputParameter();
             action.removeDoubleParamPredicate();
-//            System.out.println("============");
-            
-//            for (int i = 0; i < action.inputParamList.size(); i++) {
-//            	Param p = (Param)action.inputParamList.get(i);
-//            	System.out.println(p.parameter);
-//            	System.out.println(p.type);
-//            }
-//            System.out.println("=================== PRECONDITION ===================");
-//            for (int i = 0; i < action.preconditionList.size(); i++) {
-//            	if (action.preconditionList.get(i) instanceof Param) {
-//            		Param p = (Param)action.preconditionList.get(i);
-//                	System.out.println(p.parameter);
-//                	System.out.println(p.type);
-//            		
-//            	} else if (action.preconditionList.get(i) instanceof Predicate) {
-//            		Predicate pre = (Predicate)action.preconditionList.get(i);
-//            		System.out.println(pre.name);
-//            		for (Param x : pre.params){
-//            			System.out.println(x.parameter);
-//                    	System.out.println(x.type);
-//            		}
-//                	
-//            	}
-//            	
-//            }
-//            
-//            System.out.println("=================== EFFECT ===================");
-//            for (int i = 0; i < action.effectsList.size(); i++) {
-//            	if (action.effectsList.get(i) instanceof Param) {
-//            		Param p = (Param)action.effectsList.get(i);
-//                	System.out.println(p.parameter);
-//                	System.out.println(p.type);
-//            		
-//            	} else if (action.effectsList.get(i) instanceof Predicate) {
-//            		Predicate pre = (Predicate)action.effectsList.get(i);
-//            		System.out.println(pre.name);
-//            		for (Param x : pre.params){
-//            			System.out.println(x.parameter);
-//                    	System.out.println(x.type);
-//            		}
-//                	
-//            	}
-//            	
-//            }
-           
             
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

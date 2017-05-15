@@ -20,7 +20,7 @@ public class Param {
 	
 	@Override
     public int hashCode() {
-		String hash = parameter + "" + type;
+		String hash = type;
 		return hash.hashCode();
     }
 	
@@ -33,7 +33,7 @@ public class Param {
       if (getClass() != obj.getClass())
          return false;
       Param other = (Param) obj;
-      if (!parameter.equals(other.parameter) || !type.equals(other.type))
+      if (!type.equals(other.type))
          return false;
       return true;
     }
