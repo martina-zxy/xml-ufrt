@@ -586,7 +586,7 @@ public class MainFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (domain != null && problem != null) {
 					
-					StripsPlanner planner = new StripsPlanner(domain, problem);
+					Planner planner = new Planner(domain, problem);
 					planner.plan();
 
 					txtStrips.setText(planner.getPlanStr());

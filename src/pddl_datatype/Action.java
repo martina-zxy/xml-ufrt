@@ -11,6 +11,9 @@ public class Action {
 	public ArrayList paramPredicateList = new ArrayList();
 	public String pddl; // PDDL format representation
 	
+	/**
+	 * remove double param
+	 */
 	public void removeDoubleInputParameter() {
 	    // removables contains the list of double entries, that have to be removed later
 	    ArrayList removables = new ArrayList();
@@ -30,6 +33,9 @@ public class Action {
 		}
 	}
 	
+	/**
+	 * remove double predicates or param
+	 */
 	public void removeDoubleParamPredicate() {
 		// removables contains the list of double entries, that have to be removed later
 	    ArrayList removables = new ArrayList();
@@ -65,6 +71,10 @@ public class Action {
 		}
 	}
 	
+	/**
+	 * 
+	 * @return pddl string
+	 */
 	public String getPddl(){
 		StringBuilder pddl = new StringBuilder();
 		pddl.append("(:action " + name + "\n");
