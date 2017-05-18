@@ -170,6 +170,7 @@ public class MainFrame {
 				int returnval = fc.showOpenDialog(frmOwlsTranslator);
 				
 				if (returnval == JFileChooser.APPROVE_OPTION) {
+					listAction.clear();
 					log.setText(null);
 					
 		            File[] files = fc.getSelectedFiles();
@@ -191,13 +192,15 @@ public class MainFrame {
 						Parser parser = new Parser();
 			            parser.parse(file);		            
 			            currAction = parser.getAction();
-			            listAction.add(parser.getAction());
+			            listAction.add(currAction);
 			            log.append("\n");
 			            log.append(currAction.getPddl());
 					}
 		            
 		            txtSelectFile.setText(sb.toString());
 				}
+				
+				
 			}
 		});
 		btnNewButton.setVerticalAlignment(SwingConstants.BOTTOM);
@@ -709,7 +712,9 @@ public class MainFrame {
 			JOptionPane.showMessageDialog(frmOwlsTranslator, show, "Success", JOptionPane.INFORMATION_MESSAGE);
 			reset();
 			listAction.clear();
-
+					
+			
+			
 		} else {
 			 JOptionPane.showMessageDialog(frmOwlsTranslator, "Load an OWL-S file", "Error", JOptionPane.ERROR_MESSAGE);
 		}

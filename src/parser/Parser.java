@@ -91,7 +91,7 @@ public class Parser {
 	        writer.println(")");
 		    writer.close();
 		} catch (IOException e) {
-		   // do something
+		   e.printStackTrace();
 		}
 	}
 	

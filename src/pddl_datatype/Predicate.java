@@ -2,6 +2,11 @@ package pddl_datatype;
 
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author Martina
+ * PDDL predicate
+ */
 public class Predicate {
 	public String name;
 	public ArrayList<Param> params = new ArrayList<Param>();

@@ -144,6 +144,10 @@ public class Action {
 		return pddl.toString();
 	}
 	
+	/**
+	 * 
+	 * @return the action with parameter
+	 */
 	public String getHeader() {
 		
 		StringBuilder sb = new StringBuilder();
@@ -155,6 +159,11 @@ public class Action {
 		
 		return sb.toString();
 		
+	}
+	
+	public boolean isFeasible(ArrayList effectsList) {
+		if (this.effectsList.containsAll(effectsList)) return true;
+		return false;
 	}
 
 }

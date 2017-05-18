@@ -2,11 +2,20 @@ package pddl_datatype;
 
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author Martina
+ * Problem file 
+ */
 public class Problem {
 	public String name = "problemName";
 	public ArrayList init = new ArrayList<>();
 	public ArrayList goal = new ArrayList<>();
 	
+	/**
+	 * 
+	 * @return get pddl string
+	 */
 	public String getPddl() {
 		
 		StringBuilder pddl = new StringBuilder();
