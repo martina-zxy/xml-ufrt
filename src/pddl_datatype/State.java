@@ -10,10 +10,12 @@ import java.util.ArrayList;
  */
 public class State {
 	public ArrayList condition = new ArrayList();
+	public ArrayList effect = new ArrayList();
 	public Problem problem;
 	public int cost;
-	public State predecessor;
+	public State ancestor;
 	public Action action;
+	public State predecessor;
 	
 	public State(ArrayList condition, Problem problem, Action action) {
 		this.condition = condition;
@@ -25,5 +27,10 @@ public class State {
 				cost++;
 			}
 		}
+	}	
+	
+	public State(ArrayList effect, Action action) {
+		this.effect = effect;		
+		this.action = action;
 	}	
 }

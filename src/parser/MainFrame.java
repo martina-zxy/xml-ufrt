@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -33,6 +34,7 @@ import pddl_datatype.Domain;
 import pddl_datatype.Param;
 import pddl_datatype.Predicate;
 import pddl_datatype.Problem;
+import javax.swing.JComboBox;
 
 public class MainFrame {
 
@@ -71,6 +73,7 @@ public class MainFrame {
 	private DefaultListModel outputOptions;
 	private DefaultListModel inputSelected;
 	private DefaultListModel outputSelected;	
+	private DefaultListModel expectedOutput;
 	private Set paramSet = new HashSet();
 	private JPanel pnlViewProblem;
 	private Problem problem;
@@ -83,6 +86,13 @@ public class MainFrame {
 	private JTextArea txtStrips;
 	private JLabel lblNewLabel;
 	private List<Action> listAction = new ArrayList<Action>();
+	private JLabel lblExpectedOutput;
+	private JComboBox comboBox;
+	private JButton btnInsertOutput;
+	private JScrollPane scrollPane_4;
+	private JList listExpectedOutput;
+	private JButton btnContinue_1;
+	private ArrayList expectedOutputList;
 	
 	/**
 	 * Launch the application.
@@ -253,6 +263,7 @@ public class MainFrame {
 				outputOptions.removeAllElements();
 				inputSelected.removeAllElements();
 				outputSelected.removeAllElements();
+				expectedOutput.removeAllElements();
 				paramSet.clear();
 			}
 		});
@@ -343,6 +354,116 @@ public class MainFrame {
 	 * 3. Select IO Tab
 	 */
 	private void createSelectIOPanel() {
+		
+		JPanel panel = new JPanel();
+		tabbedPane.addTab("3. Expected result", null, panel, null);
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[]{0, 391, 0, 124, 0};
+		gbl_panel.rowHeights = new int[]{25, 0, 0, 0, 0};
+		gbl_panel.columnWeights = new double[]{1.0, 1.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
+		panel.setLayout(gbl_panel);
+		
+		lblExpectedOutput = new JLabel("Expected Output");
+		
+		GridBagConstraints gbc_lblExpectedOutput = new GridBagConstraints();
+		gbc_lblExpectedOutput.anchor = GridBagConstraints.WEST;
+		gbc_lblExpectedOutput.insets = new Insets(0, 10, 5, 5);
+		gbc_lblExpectedOutput.gridx = 0;
+		gbc_lblExpectedOutput.gridy = 0;
+		panel.add(lblExpectedOutput, gbc_lblExpectedOutput);
+		
+		comboBox = new JComboBox();
+		
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		GridBagConstraints gbc_comboBox = new GridBagConstraints();
+		gbc_comboBox.insets = new Insets(0, 0, 5, 5);
+		gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_comboBox.gridx = 1;
+		gbc_comboBox.gridy = 0;
+		panel.add(comboBox, gbc_comboBox);
+		
+		btnInsertOutput = new JButton("Add");
+		btnInsertOutput.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				expectedOutput.addElement(comboBox.getSelectedItem());
+//				System.out.println(comboBox.getSelectedItem());
+			}
+		});
+		GridBagConstraints gbc_btnInsertOutput = new GridBagConstraints();
+		gbc_btnInsertOutput.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnInsertOutput.insets = new Insets(0, 0, 5, 0);
+		gbc_btnInsertOutput.gridx = 3;
+		gbc_btnInsertOutput.gridy = 0;
+		panel.add(btnInsertOutput, gbc_btnInsertOutput);
+		
+		scrollPane_4 = new JScrollPane();
+		GridBagConstraints gbc_scrollPane_4 = new GridBagConstraints();
+		gbc_scrollPane_4.insets = new Insets(0, 0, 5, 5);
+		gbc_scrollPane_4.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane_4.gridx = 1;
+		gbc_scrollPane_4.gridy = 1;
+		panel.add(scrollPane_4, gbc_scrollPane_4);
+		
+		expectedOutput = new DefaultListModel();
+		
+		listExpectedOutput = new JList(expectedOutput);
+		
+		listExpectedOutput.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component renderer = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (renderer instanceof JLabel) {
+                    ((JLabel) renderer).setText(value.toString());
+                }
+                return renderer;
+            }
+        });
+		
+		scrollPane_4.setViewportView(listExpectedOutput);
+		
+		btnContinue_1 = new JButton("Continue");
+		btnContinue_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {				
+
+				tabbedPane.setSelectedIndex(3);
+				ArrayList outputToMove = new ArrayList<>();
+				
+				for (int i = 0; i < outputOptions.size(); i++) {
+					for (int j = 0; j < expectedOutput.size(); j++) {
+//						System.out.println(expectedOutput.get(j).toString() + ":" + outputOptions.getElementAt(i).toString());
+						if(expectedOutput.get(j).equals(outputOptions.getElementAt(i).toString())){
+							outputToMove.add(outputOptions.getElementAt(i));
+						}
+					}
+				}
+				for (Object object : outputToMove) {
+					outputOptions.removeElement(object);
+					outputSelected.addElement(object);
+				}
+				Recommender rec = new Recommender(domain.listAction, outputToMove);
+				ArrayList recInput = rec.recommend();
+				
+				if (recInput != null) {
+					for(Object o : recInput) {
+						inputOptions.removeElement(o);
+						inputSelected.addElement(o);
+					}
+					JOptionPane.showMessageDialog(frmOwlsTranslator, "Input recommendation is found", "Warning", JOptionPane.INFORMATION_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(frmOwlsTranslator, "No recommendation for input can be found", "Warning", JOptionPane.INFORMATION_MESSAGE);
+				}
+				
+			}
+		});
+		GridBagConstraints gbc_btnContinue_1 = new GridBagConstraints();
+		gbc_btnContinue_1.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnContinue_1.gridx = 3;
+		gbc_btnContinue_1.gridy = 3;
+		panel.add(btnContinue_1, gbc_btnContinue_1);
 		pnlSelectIO = new JPanel();
 		tabbedPane.addTab("3. Select Input & Output", null, pnlSelectIO, null);
 		GridBagLayout gbl_pnlSelectIO = new GridBagLayout();
@@ -546,7 +667,7 @@ public class MainFrame {
 				problem.init.addAll(Arrays.asList(inputSelected.toArray()));
 				problem.goal.addAll(Arrays.asList(outputSelected.toArray()));
 				txtProblem.setText(problem.getPddl());
-				tabbedPane.setSelectedIndex(3);
+				tabbedPane.setSelectedIndex(4);
 				
 			}
 		});
@@ -593,7 +714,7 @@ public class MainFrame {
 					planner.plan();
 
 					txtStrips.setText(planner.getPlanStr());
-					tabbedPane.setSelectedIndex(4);
+					tabbedPane.setSelectedIndex(5);
 				}
 			}
 		});
@@ -659,6 +780,7 @@ public class MainFrame {
 	public void addActionToDomain() {
 
 		if (listAction.size() > 0) {
+			
 			for (Action currAction : listAction) {
 				
 				// Check if action exists
@@ -713,7 +835,15 @@ public class MainFrame {
 			reset();
 			listAction.clear();
 					
+			List<String> strOutput = new ArrayList<String>();
 			
+			for (Object o : paramSet) {
+				strOutput.add(o.toString());
+			}
+			
+			String[] arrOutput = new String[strOutput.size()] ;
+			strOutput.toArray(arrOutput);
+			comboBox.setModel(new DefaultComboBoxModel<String>(arrOutput));
 			
 		} else {
 			 JOptionPane.showMessageDialog(frmOwlsTranslator, "Load an OWL-S file", "Error", JOptionPane.ERROR_MESSAGE);

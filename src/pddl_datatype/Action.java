@@ -162,7 +162,20 @@ public class Action {
 	}
 	
 	public boolean isFeasible(ArrayList effectsList) {
-		if (this.effectsList.containsAll(effectsList)) return true;
+		
+		if (this.effectsList.containsAll(effectsList)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isIntersect(ArrayList effectsList) {
+		
+		for (Object objInput : effectsList) {
+			for (Object actEffect : this.effectsList) {
+				if (objInput.equals(actEffect)) return true;
+			}
+		}
 		return false;
 	}
 

@@ -54,9 +54,9 @@ public class Planner {
 	public List<Action> getPlan(State finalState) {
 		List<Action> plan = new ArrayList<Action>();
 		State obs = finalState;
-		while (obs.predecessor != null) {
+		while (obs.ancestor != null) {
 			plan.add(obs.action);
-			obs = obs.predecessor;
+			obs = obs.ancestor;
 		}
 		return plan;
 	}
@@ -78,7 +78,7 @@ public class Planner {
 				if(checkAction(action, obsState.condition)) {
 					ArrayList newCondition = getActionResult(action, obsState.condition);
 					State newState = new State(newCondition, problem, action);
-					newState.predecessor = obsState;
+					newState.ancestor = obsState;
 		
 					if(newState.cost == 0) {
 						isGoalReached = true;
