@@ -118,31 +118,7 @@ public class Recommender {
 		for (Action a : rec.achievingAction) {
 			System.out.println(a.name);
 		}
-//		for (Action act : listAction) {
-//			boolean test = act.isFeasible(listDesiredOutput);
-//			
-//			if (test) {
-//				System.out.println(act.name + " TRUE");
-//				
-//			}
-//			
-////			while ()
-//			
-//		}
-		
-//		List<String> fileNames = new ArrayList<String>();
-//		fileNames.add("E:/Master/2. UFRT/4. XML & Web Technology/OWL-S WEB SERVICES/OWL-S WEB SERVICES/Services/s91.owls")
-//		
-//		File file = new File("E:/Master/2. UFRT/4. XML & Web Technology/OWL-S WEB SERVICES/OWL-S WEB SERVICES/Services/s91.owls");
-//		Parser parser = new Parser();
-//        parser.parse(file);
-//        
-//        Action add = parser.getAction();
-//        System.out.println(add.getPddl());
-//        
-        
-        
-//        System.out.println(parser.getAction().getPddl());
+
 	}
 
 }
