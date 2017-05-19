@@ -465,7 +465,7 @@ public class MainFrame {
 		gbc_btnContinue_1.gridy = 3;
 		panel.add(btnContinue_1, gbc_btnContinue_1);
 		pnlSelectIO = new JPanel();
-		tabbedPane.addTab("3. Select Input & Output", null, pnlSelectIO, null);
+		tabbedPane.addTab("4. Select Input & Output", null, pnlSelectIO, null);
 		GridBagLayout gbl_pnlSelectIO = new GridBagLayout();
 		gbl_pnlSelectIO.columnWidths = new int[]{250, 0, 250, 0};
 		gbl_pnlSelectIO.rowHeights = new int[]{0, 75, 0, 0, 75, 0, 75, 0, 0, 75, 0, 0};
@@ -685,7 +685,7 @@ public class MainFrame {
 	 */
 	private void createProblemFileTab() {
 		pnlViewProblem = new JPanel();
-		tabbedPane.addTab("4. Problem File", null, pnlViewProblem, null);
+		tabbedPane.addTab("5. Problem File", null, pnlViewProblem, null);
 		GridBagLayout gbl_pnlViewProblem = new GridBagLayout();
 		gbl_pnlViewProblem.columnWidths = new int[]{0, 0};
 		gbl_pnlViewProblem.rowHeights = new int[]{0, 0, 0};
@@ -731,7 +731,7 @@ public class MainFrame {
 	 */
 	private void createStripsPlanningTab() {
 		pnlStrips = new JPanel();
-		tabbedPane.addTab("5. Planning", null, pnlStrips, null);
+		tabbedPane.addTab("6. Planning", null, pnlStrips, null);
 		GridBagLayout gbl_pnlStrips = new GridBagLayout();
 		gbl_pnlStrips.columnWidths = new int[]{0, 0};
 		gbl_pnlStrips.rowHeights = new int[]{0, 0, 0};
