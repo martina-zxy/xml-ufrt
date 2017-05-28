@@ -76,49 +76,5 @@ public class Recommender {
 		
 		return null;
 	}
-	
-	
-	public static void main(String[] args) throws IOException {
-		
-		LinkedList<Action> actionQueue = new LinkedList<Action>();
-		List<Action> listAction = new ArrayList<Action>();
-		List<Action> actionContainer = new ArrayList<Action>();
-		
-		
-		
-		try(Stream<Path> paths = Files.walk(Paths.get("E:/Master/2. UFRT/4. XML & Web Technology/OWL-S WEB SERVICES/OWL-S WEB SERVICES/Services/medical-hospital_investigating_service"))) {
-		    paths.forEach(filePath -> {
-		        if (Files.isRegularFile(filePath)) {
-		            File file = new File(filePath.toString());
-		    		Parser parser = new Parser();
-		            parser.parse(file);
-		            
-		            Action add = parser.getAction();
-		            listAction.add(add);
-		        }
-		    });
-		} 
-		
-		ArrayList listDesiredOutput = new ArrayList();
-		Param o1 = new Param("","ontology/SUMO.owl#DiagnosticProcess");
-		Param o2 = new Param("","ontology/finance_th_web.owl#cost");
-		Param o3 = new Param("","ontology/SUMO.owl#IntentionalPsychologicalProcess");
-		Param o4 = new Param("","ontology/SUMO.owl#IntentionalPsychologicalProcess");
-		
-		listDesiredOutput.add(o1);
-		listDesiredOutput.add(o2);
-		listDesiredOutput.add(o3);
-		listDesiredOutput.add(o4);
-		Recommender rec = new Recommender(listAction, listDesiredOutput);
-		ArrayList res = rec.recommend();
-		System.out.println(res.size());
-		for (Object object : res) {
-			System.out.println(res.toString());
-		}
-		for (Action a : rec.achievingAction) {
-			System.out.println(a.name);
-		}
-
-	}
 
 }
